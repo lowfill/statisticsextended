@@ -12,27 +12,27 @@
   $group = get_input("group_guid");
 
   $visits_count = get_views_counter($group);
-  $member_visits_count = cop_statistics_members_views($group);
+  $member_visits_count = statistics_extended_members_views($group);
   //Members data
   $members = array("internal","external");
-  list($internal,$external) = cop_statistics_members_count($group);
+  list($internal,$external) = statistics_extended_members_count($group);
   $members_totals = array("internal"=>$internal,"external"=>$external);
-  $members_labels = cop_statistics_label_generator($members,$members_totals);
+  $members_labels = statistics_extended_label_generator($members,$members_totals);
 
   // Members activity data
   $active_labels = array("active","inactive");
-  list($active,$inactive) = cop_statistics_active_count($group);
+  list($active,$inactive) = statistics_extended_active_count($group);
   $active_totals = array("active"=>$active,"inactive"=>$inactive);
-  $active_labels = cop_statistics_label_generator($active_labels,$active_totals);
+  $active_labels = statistics_extended_label_generator($active_labels,$active_totals);
 
   //Resources data
   $resources = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
-  $resources_totals = cop_statitics_objects_count($resources,$group);
+  $resources_totals = statistics_extended_objects_count($resources,$group);
   $resources_totals["page"]+=$resources_totals["page_top"];
 
   array_pop($resources);
   array_pop($resources_totals);
-  $resources_labels = cop_statistics_label_generator($resources,$resources_totals);
+  $resources_labels = statistics_extended_label_generator($resources,$resources_totals);
 
 ?>
 <h2><?php echo sprintf(elgg_echo("statistics:groups:visits"),$visits_count)?>  <small>[<a href="<?php echo $vars["url"]?>pg/group_statistics/<?php echo $group;?>/details"><?php echo elgg_echo("details")?></a>]</small></h2>

@@ -29,15 +29,15 @@ switch($zoom){
 }
 switch($serie){
 	case "users":
-		$data_source = cop_statistics_users_timeline($zoom);
+		$data_source = statistics_extended_users_timeline($zoom);
 		$color = "blue";
 		break;
 	case "logins":
-		$data_source = cop_statistics_logins_timeline($zoom);
+		$data_source = statistics_extended_logins_timeline($zoom);
 		$color = "red";
 		break;
 	case "groups":
-		$data_source = cop_statistics_groups_timeline($zoom);
+		$data_source = statistics_extended_groups_timeline($zoom);
 		$color = "yellow";
 		break;
 }

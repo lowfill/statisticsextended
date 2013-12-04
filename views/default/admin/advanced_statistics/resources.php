@@ -11,19 +11,19 @@
 
   //Resources data
   $resources = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
-  $resources_totals = cop_statitics_objects_count($resources);
+  $resources_totals = statistics_extended_objects_count($resources);
   $resources_totals["page"]+=$resources_totals["page_top"];
   array_pop($resources);
   array_pop($resources_totals);
-  $resources_labels = cop_statistics_label_generator($resources,$resources_totals,'statistics:label:type:');
+  $resources_labels = statistics_extended_label_generator($resources,$resources_totals,'statistics:label:type:');
 
   $resources_views = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
-  $resources_views_totals = cop_statitics_objects_view_count($resources_views);
+  $resources_views_totals = statistics_extended_objects_view_count($resources_views);
   $resources_views_totals["page"]+=$resources_views_totals["page_top"];
 
   array_pop($resources_views);
   array_pop($resources_views_totals);
-  $resources_views_labels = cop_statistics_label_generator($resources_views,$resources_views_totals,'statistics:label:type:');
+  $resources_views_labels = statistics_extended_label_generator($resources_views,$resources_views_totals,'statistics:label:type:');
 
 ?>
 <div id="statistics_group_graphs" align="center">

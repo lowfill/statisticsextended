@@ -11,26 +11,26 @@
 
   $groups = elgg_get_entities(array('types'=>'group','count'=>true));
 
-  list($group_types,$group_types_totals) = cop_statistics_groups_property_count("group_type");
-  $group_types = cop_statistics_label_generator($group_types,$group_types_totals);
+  list($group_types,$group_types_totals) = statistics_extended_groups_property_count("group_type");
+  $group_types = statistics_extended_label_generator($group_types,$group_types_totals);
 
-  list($organizational_unit_types,$organizational_unit_totals) = cop_statistics_groups_property_count("organizational_unit");
-  $organizational_unit_types = cop_statistics_label_generator($organizational_unit_types,$organizational_unit_totals,"");
+  list($organizational_unit_types,$organizational_unit_totals) = statistics_extended_groups_property_count("organizational_unit");
+  $organizational_unit_types = statistics_extended_label_generator($organizational_unit_types,$organizational_unit_totals,"");
 
-  list($impact_contribution_types,$impact_contribution_totals) = cop_statistics_groups_property_count("impact_contribution");
-  $impact_contribution_types = cop_statistics_label_generator($impact_contribution_types,$impact_contribution_totals);
+  list($impact_contribution_types,$impact_contribution_totals) = statistics_extended_groups_property_count("impact_contribution");
+  $impact_contribution_types = statistics_extended_label_generator($impact_contribution_types,$impact_contribution_totals);
 
-  list($impact_contribution_category_types,$impact_contribution_category_totals) = cop_statistics_groups_property_count("impact_contribution_category");
-  $impact_contribution_category_types = cop_statistics_label_generator($impact_contribution_category_types,$impact_contribution_category_totals);
+  list($impact_contribution_category_types,$impact_contribution_category_totals) = statistics_extended_groups_property_count("impact_contribution_category");
+  $impact_contribution_category_types = statistics_extended_label_generator($impact_contribution_category_types,$impact_contribution_category_totals);
 
-  list($public_types,$public_totals) = cop_statistics_groups_property_count("content_privacy");
-  $public_types = cop_statistics_label_generator($public_types,$public_totals);
+  list($public_types,$public_totals) = statistics_extended_groups_property_count("content_privacy");
+  $public_types = statistics_extended_label_generator($public_types,$public_totals);
 
-  list($access_types,$access_totals) = cop_statistics_groups_property_count("membership");
-  $access_types = cop_statistics_label_generator($access_types,$access_totals);
+  list($access_types,$access_totals) = statistics_extended_groups_property_count("membership");
+  $access_types = statistics_extended_label_generator($access_types,$access_totals);
 
-  list($status_types,$status_totals) = cop_statistics_groups_property_count("group_status");
-  $status_types = cop_statistics_label_generator($status_types,$status_totals);
+  list($status_types,$status_totals) = statistics_extended_groups_property_count("group_status");
+  $status_types = statistics_extended_label_generator($status_types,$status_totals);
 
   //TODO Change the id container for custom CSS layout
 ?>

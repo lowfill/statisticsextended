@@ -9,42 +9,39 @@
  * @link http://lowfill.org
  */
 
-action_gatekeeper();
-admin_gatekeeper();
+elgg_load_library('statistics_extended:lib');
+elgg_load_library('statistics_extended:export:lib');
+elgg_load_library('statistics_extended:excel:lib');
 
-statistics_extended_load_library();
 
 $type = get_input("type","global");
 set_time_limit(0);
 
-$contents = "";
+
 switch($type){
 	case "global":
-		$contents = cop_statistics_export_global_data();
+		$contents = statistics_extended_export_global_data();
 		break;
 	case "groups":
-		$contents = cop_statistics_export_global_group_data();
+		$contents = statistics_extended_export_global_group_data();
 		break;
 	case "resources":
-		$contents = cop_statistics_export_global_resources_data();
+		$contents = statistics_extended_export_global_resources_data();
 		break;
 }
 if(!empty($contents)){
 	$file_name = date("Y-m-d")."-";
-	$file_name.= "knl_statistics_{$type}";
-	$file_name.= ".csv";
+	$file_name.= "statistics_{$type}";
+	$file_name.= ".xlsx";
 
-	header('Content-Type: application/vnd.ms-excel');
-	header('Content-Transfer-Encoding: binary');
-	header("Expires: 0");
-	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	header("Content-disposition: attachment;filename=$file_name");
-	header("Content-Length: ".strlen($contents));
-	$splitString = str_split($contents, 1024);
-	foreach($splitString as $chunk){
-		echo $chunk;
-	}
+	header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+	header('Content-Disposition: attachment;filename="'.$file_name.'"');
+	header('Cache-Control: max-age=0');
+
+	$objWriter = PHPExcel_IOFactory::createWriter($contents, 'Excel2007');
+	$objWriter->save('php://output');
 	exit;
+
 }
 else{
 	register_error(elgg_echo("statistics:error:groups:no_data"));

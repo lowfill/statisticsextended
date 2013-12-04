@@ -13,12 +13,12 @@
 
   //Resources data
   $resources = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
-  $resources_totals = cop_statitics_objects_view_count($resources,$group);
+  $resources_totals = statistics_extended_objects_view_count($resources,$group);
   $resources_totals["page"]+=$resources_totals["page_top"];
 
   array_pop($resources);
   array_pop($resources_totals);
-  $resources_labels = cop_statistics_label_generator($resources,$resources_totals,'statistics:label:type:');
+  $resources_labels = statistics_extended_label_generator($resources,$resources_totals,'statistics:label:type:');
 
 ?>
 <div id="statistics_group_graphs" align="center">

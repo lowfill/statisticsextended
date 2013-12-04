@@ -12,6 +12,8 @@
 function statistics_extended_init(){
 
     elgg_register_library('statistics_extended:lib', dirname(__FILE__)."/lib/statistics.php");
+    elgg_register_library('statistics_extended:export:lib', dirname(__FILE__)."/lib/export.php");
+    elgg_register_library('statistics_extended:excel:lib', dirname(__FILE__)."/vendors/PHPExcel/Classes/PHPExcel.php");
 
 	elgg_extend_view('css','statistics/css');
 

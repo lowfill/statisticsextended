@@ -60,7 +60,7 @@ if(!empty($entities)){
 			$internal = "<input type=\"checkbox\" disabled=\"disabled\" checked=\"checked\">";
 		}
 
-		$values = cop_statitics_objects_count($items,$group,$entity->guid);
+		$values = statistics_extended_objects_count($items,$group,$entity->guid);
 		$values["page"]+=$values["page_top"];
 		array_pop($values);
 

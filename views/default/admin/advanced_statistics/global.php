@@ -5,14 +5,14 @@
 
   //Members data
   $members = array("internal","external");
-  list($internal,$external) = cop_statistics_members_count();
+  list($internal,$external) = statistics_extended_members_count();
   $members_totals = array("internal"=>$internal,"external"=>$external);
-  $members_labels = cop_statistics_label_generator($members,$members_totals);
+  $members_labels = statistics_extended_label_generator($members,$members_totals);
 
   $active_labels = array("active","inactive");
-  list($active,$inactive) = cop_statistics_active_count();
+  list($active,$inactive) = statistics_extended_active_count();
   $active_totals = array("active"=>$active,"inactive"=>$inactive);
-  $active_labels = cop_statistics_label_generator($active_labels,$active_totals);
+  $active_labels = statistics_extended_label_generator($active_labels,$active_totals);
 
     //Resources data
   $resources_tpl = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
@@ -22,12 +22,12 @@
       $resources[]=$resource;
     }
   }
-  $resources_totals = cop_statitics_objects_count($resources);
+  $resources_totals = statistics_extended_objects_count($resources);
   $resources_totals["page"]+=$resources_totals["page_top"];
 
   array_pop($resources);
   array_pop($resources_totals);
-  $resources_labels = cop_statistics_label_generator($resources,$resources_totals);
+  $resources_labels = statistics_extended_label_generator($resources,$resources_totals);
 
 ?>
 <h2><?php echo sprintf(elgg_echo("statistics:users:counter"),$users)?></h2>

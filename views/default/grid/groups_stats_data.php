@@ -53,7 +53,7 @@ if(!empty($entities)){
 		$type = elgg_echo($entity->group_type);
 		$organizational_unit=str_replace("||"," ",$entity->organizational_unit);
 
-		list($internal,$external) = cop_statistics_members_count($entity->guid);
+		list($internal,$external) = statistics_extended_members_count($entity->guid);
 
 		$status = $entity->group_status;
 		if(empty($status)){
@@ -66,7 +66,7 @@ if(!empty($entities)){
 			$access = "<input type=\"checkbox\" disabled=\"disabled\" checked=\"checked\">";
 		}
 
-		$values = cop_statitics_objects_count($items,$entity->guid);
+		$values = statistics_extended_objects_count($items,$entity->guid);
 		$values["page"]+=$values["page_top"];
 		array_pop($values);
 

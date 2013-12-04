@@ -58,7 +58,7 @@ if(!empty($entities)){
 		}
 
 		$location = str_replace("||",",",$entity->location);
-		$values = cop_statitics_objects_count($items,null,$entity->guid);
+		$values = statistics_extended_objects_count($items,null,$entity->guid);
 		$values["page"]+=$values["page_top"];
 		array_pop($values);
 

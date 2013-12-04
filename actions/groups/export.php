@@ -23,10 +23,10 @@ if(!empty($group_guid)){
 		$contents = "";
 		switch($type){
 			case "global":
-				$contents = cop_statistics_export_group_global_data($group);
+				$contents = statistics_extended_export_group_global_data($group);
 				break;
 			case "resources":
-				$contents = cop_statistics_export_group_resources_data($group);
+				$contents = statistics_extended_export_group_resources_data($group);
 				break;
 		}
 		if(!empty($contents)){
