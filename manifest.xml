@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin_manifest xmlns="http://www.elgg.org/plugin_manifest/1.8">
+	<name>Statistics</name>
+	<author>Diego Andrés Ramírez</author>
+	<version>1.0</version>
+	<description>Shows detailed statistics about the site use.</description>
+	<website>http//lowfill.org</website>
+	<licence>GNU Public License version 3</licence>
+   	<requires>
+		<type>elgg_release</type>
+		<version>1.8</version>
+	</requires>
+	<requires>
+        <type>plugin</type>
+        <name>libform_utils</name>
+    </requires>
+	<requires>
+        <type>plugin</type>
+        <name>views_counter</name>
+    </requires>
+    <requires>
+		<type>priority</type>
+		<plugin>libform_utils</plugin>
+		<priority>after</priority>
+	</requires>
+</plugin_manifest>
