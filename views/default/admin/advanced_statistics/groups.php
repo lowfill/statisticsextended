@@ -7,6 +7,7 @@
  * @link http://lowfill.org
  */
 
+  elgg_load_css('statistics_extended:css');
   statistics_extended_load_library();
 
   $groups = elgg_get_entities(array('types'=>'group','count'=>true));

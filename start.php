@@ -15,7 +15,7 @@ function statistics_extended_init(){
     elgg_register_library('statistics_extended:export:lib', dirname(__FILE__)."/lib/export.php");
     elgg_register_library('statistics_extended:excel:lib', dirname(__FILE__)."/vendors/PHPExcel/Classes/PHPExcel.php");
 
-	elgg_extend_view('css','statistics/css');
+    elgg_register_css('statistics_extended:css', elgg_get_simplecache_url('css', 'statistics_extended'));
 
 	elgg_register_page_handler("group_statistics","statistics_extended_group_handler");
 	elgg_register_page_handler("global_statistics","statistics_extended_global_handler");

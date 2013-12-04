@@ -1,5 +1,6 @@
 <?php
   elgg_load_library('statistics_extended:lib');
+  elgg_load_css('statistics_extended:css');
 
   $users = elgg_get_entities(array('types'=>'user','count'=>true));
 
