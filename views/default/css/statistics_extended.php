@@ -26,8 +26,9 @@
 	text-align:center;
 }
 .statistics_buttons{
-	margin:5px;
-	float:right;
+	margin:1em;
+	padding:1em;
+	text-align:right;
 }
 .flexigrid{
   width:100%;
