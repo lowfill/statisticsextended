@@ -11,9 +11,10 @@
  * @param group_guid
  */
 
-global $CONFIG;
 
-statistics_extended_load_library();
+
+elgg_load_library('statistics_extended:lib');
+
 
 $page = get_input('grid_page',1);
 $rp = get_input('rp',100);
@@ -21,6 +22,7 @@ $sortname = get_input('sortname','e.guid');
 $sortorder = get_input('sortorder','desc');
 $start = (($page-1) * $rp);
 $group = get_input("group_guid");
+$group_entity = get_entity($group);
 
 $options = array('types'=>'user',
 				 'count'=>true,
@@ -44,7 +46,16 @@ header("Cache-Control: no-cache, must-revalidate" );
 header("Pragma: no-cache" );
 header("Content-type: text/x-json");
 
-$items = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+$tools = elgg_get_config('group_tool_options');
+$items = array();
+if(is_array($tools)){
+  foreach($tools as $tool){
+    $tool_name = $tool->name."_enable";
+    if($group_entity->$tool_name == 'yes' && $tool->name !='activity'){
+      $items=array_merge($items,statistics_extended_tool_object($tool->name));
+    }
+  }
+}
 
 $rows = array();
 if(!empty($entities)){
@@ -55,16 +66,11 @@ if(!empty($entities)){
 		$name = "<a href=\"{$entity->getUrl()}\">$name</a>";
 		$email = (!empty($entity->contactemail)) ? $entity->contactemail : $entity->email;
 
-		$internal = "<input type=\"checkbox\" disabled=\"disabled\" >";
-		if(strpos($email,"@iadb.org")>0){
-			$internal = "<input type=\"checkbox\" disabled=\"disabled\" checked=\"checked\">";
-		}
-
 		$values = statistics_extended_objects_count($items,$group,$entity->guid);
 		$values["page"]+=$values["page_top"];
-		array_pop($values);
+		unset($values['page_top']);
 
-		$row['cell']=array($name,$internal);
+		$row['cell']=array($name);
 		foreach($values as $value){
 			$row['cell'][]=$value;
 		}

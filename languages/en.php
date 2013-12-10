@@ -1,4 +1,4 @@
-<?php 
+<?php
 $english = array(
 	'statistics:admin:manager'=>"Advanced Statistics",
 	'statistics:global'=>"Global",
@@ -28,10 +28,14 @@ $english = array(
 	'statistics:groups:member:internal'=>"Internal",
 	'statistics:groups:member:blog'=>"Blog",
 	'statistics:groups:member:file'=>"Files",
-	'statistics:groups:member:bookmark'=>"Bookmarks",
-	'statistics:groups:member:event'=>"Events",
-	'statistics:groups:member:discussion'=>"Discussions",
+	'statistics:groups:member:bookmarks'=>"Bookmarks",
+	'statistics:groups:member:event_calendar'=>"Events",
+	'statistics:groups:member:groupforumtopic'=>"Discussions",
 	'statistics:groups:member:page'=>"Pages",
+    'statistics:groups:member:image'=>"Images",
+    'statistics:groups:member:poll'=>"Polls",
+    'statistics:groups:member:album'=>"Albumns",
+
 
 	'statistics:global:member:guid'=>"Guid",
 	'statistics:global:member:name'=>"Name",
@@ -59,6 +63,9 @@ $english = array(
 	'statistics:label:event_calendar'=>"Events (%s)",
 	'statistics:label:groupforumtopic'=>"Discussions (%s)",
 	'statistics:label:page'=>"Pages (%s)",
+    'statistics:label:poll'=>"Polls (%s)",
+    'statistics:label:image'=>"Images (%s)",
+    'statistics:label:album'=>"Albums (%s)",
 
 	'statistics:label:type:blog'=>"Blog",
 	'statistics:label:type:file'=>"File",
@@ -67,12 +74,16 @@ $english = array(
 	'statistics:label:type:groupforumtopic'=>"Discussion",
 	'statistics:label:type:page'=>"Page",
 	'statistics:label:type:page_top'=>"Page",
+    'statistics:label:type:poll'=>"Poll",
+    'statistics:label:type:image'=>"Image",
+    'statistics:label:type:album'=>"Album",
 
 	'statistics:groups:resources:guid'=>"Guid",
 	'statistics:groups:resources:type'=>"Type",
 	'statistics:groups:resources:name'=>"Title",
 	'statistics:groups:resources:title'=>"Title",
 	'statistics:groups:resources:visits'=>"Visits",
+    'statistics:groups:resources:user'=>'User',
 
 	'statistics:global:resources:group'=>"Group",
 	'statistics:global:resources:owner'=>"User",
@@ -95,7 +106,7 @@ $english = array(
 	'statistics:global:groups:access'=>"Public",
 	'statistics:global:groups:blog'=>"Blog",
 	'statistics:global:groups:file'=>"Files",
-	'statistics:global:groups:bookmark'=>"Bookmarks",
+	'statistics:global:groups:bookmarks'=>"Bookmarks",
 	'statistics:global:groups:event'=>"Events",
 	'statistics:global:groups:discussion'=>"Discussions",
 	'statistics:global:groups:page'=>"Pages",

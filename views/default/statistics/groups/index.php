@@ -7,17 +7,15 @@
  * @link http://lowfill.org
  */
 
-  statistics_extended_load_library();
+  elgg_load_library('statistics_extended:lib');
 
-  $group = get_input("group_guid");
+  elgg_load_css('statistics_extended:css');
+
+  $group = $vars["group_guid"];
+  $group_entity = get_entity($group);
 
   $visits_count = get_views_counter($group);
   $member_visits_count = statistics_extended_members_views($group);
-  //Members data
-  $members = array("internal","external");
-  list($internal,$external) = statistics_extended_members_count($group);
-  $members_totals = array("internal"=>$internal,"external"=>$external);
-  $members_labels = statistics_extended_label_generator($members,$members_totals);
 
   // Members activity data
   $active_labels = array("active","inactive");
@@ -26,12 +24,21 @@
   $active_labels = statistics_extended_label_generator($active_labels,$active_totals);
 
   //Resources data
-  $resources = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+  $tools = elgg_get_config('group_tool_options');
+  $resources = array();
+  if(is_array($tools)){
+     foreach($tools as $tool){
+       $tool_name = $tool->name."_enable";
+       if($group_entity->$tool_name == 'yes' && $tool->name !='activity'){
+         $resources=array_merge($resources,statistics_extended_tool_object($tool->name));
+       }
+     }
+  }
   $resources_totals = statistics_extended_objects_count($resources,$group);
   $resources_totals["page"]+=$resources_totals["page_top"];
 
-  array_pop($resources);
-  array_pop($resources_totals);
+  unset($resources[current(array_keys($resources,'page_top'))]);
+  unset($resources_totals['page_top']);
   $resources_labels = statistics_extended_label_generator($resources,$resources_totals);
 
 ?>
@@ -39,23 +46,17 @@
 <h2><?php echo sprintf(elgg_echo("statistics:groups:members:visits"),$member_visits_count)?></h2>
 <br>
 <div id="statistics_group_graphs">
-<?php echo elgg_view("output/pie",array("internalname"=>'statistics_group_users_graph',
-										"class"=>"statistics_graph",
-										"size"=>"300x100",
-										"title"=>elgg_echo("statistics:members"),
-                                        "labels"=>$members_labels,
-										"values"=>$members_totals))?>
 
 <?php echo elgg_view("output/pie",array("internalname"=>'statistics_group_active_graph',
 										"class"=>"statistics_graph",
-										"size"=>"300x100",
+										"size"=>"300x120",
 										"title"=>elgg_echo("statistics:members"),
                                         "labels"=>$active_labels,
 										"values"=>$active_totals))?>
 
 <?php echo elgg_view("output/pie",array("internalname"=>'statistics_group_resources_graph',
 										"class"=>"statistics_graph",
-										"size"=>"300x100",
+										"size"=>"300x120",
 										"title"=>elgg_echo("statistics:resources"),
 										"labels"=>$resources_labels,
 										"values"=>$resources_totals))?>
@@ -79,69 +80,15 @@ $column_config[]=array('display'=>elgg_echo("statistics:groups:member:name"),
 	'sortable'=>false,
 	'align'=>'center'
 );
-$column_config[]=array('display'=>elgg_echo("statistics:groups:member:location"),
-	'name'=>'location',
-	'width'=> 80,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo("statistics:groups:member:actor_type"),
-	'name'=>'actor_type',
-	'width'=> 100,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo("statistics:groups:member:experience_theme"),
-	'name'=>'experience_theme',
-	'width'=> 50,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo("statistics:groups:member:internal"),
-	'name'=>'internal',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo('statistics:groups:member:blog'),
-	'name'=>'blog',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo('statistics:groups:member:file'),
-	'name'=>'file',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
 
-$column_config[]=array('display'=>elgg_echo('statistics:groups:member:bookmark'),
-	'name'=>'bookmark',
-	'width'=> 70,
-	'sortable'=>false,
-	'align'=>'center'
-);
-
-$column_config[]=array('display'=>elgg_echo('statistics:groups:member:event'),
-	'name'=>'event',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-
-$column_config[]=array('display'=>elgg_echo('statistics:groups:member:discussion'),
-	'name'=>'discussion',
-	'width'=> 70,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo('statistics:groups:member:page'),
-	'name'=>'page',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
+foreach($resources as $resource){
+  $column_config[]=array('display'=>elgg_echo('statistics:groups:member:'.$resource),
+      'name'=>$resource,
+      'width'=> 50,
+      'sortable'=>false,
+      'align'=>'center'
+  );
+}
 
 echo elgg_view("output/grid",array('internalname'=>'statistics_groups_global',
                                    'endpoint'=>'group_members_stats',

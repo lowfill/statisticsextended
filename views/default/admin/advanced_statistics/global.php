@@ -15,7 +15,8 @@
   $active_totals = array("active"=>$active,"inactive"=>$inactive);
   $active_labels = statistics_extended_label_generator($active_labels,$active_totals);
 
-    //Resources data
+  //Resources data
+  $resources_tpl = array();
   $resources_tpl = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
   $resources = array();
   foreach($resources_tpl as $resource){

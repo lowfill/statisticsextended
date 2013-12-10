@@ -46,4 +46,4 @@ if(!empty($contents)){
 else{
 	register_error(elgg_echo("statistics:error:groups:no_data"));
 }
-forward("pg/global_statistics");
+forward("admin/advanced_statistics/global");

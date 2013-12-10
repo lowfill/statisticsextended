@@ -1,15 +1,30 @@
 <?php
 /**
- * Return a CSV with the global information from a specified group
+ * Return a Excel with the global information from a specified group
  * @param $group
  * @param $cached
  * @return string
  */
 function statistics_extended_export_group_global_data($group,$cached=false){
-  //TODO Migrate this to PHPExcel
-  $resp = "";
-  $items = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+  $output = new PHPExcel();
+  $output->getProperties()->setCreator(elgg_get_site_entity()->name)
+  ->setLastModifiedBy(elgg_get_site_entity()->name)
+  ->setTitle($group->name. ' ' .elgg_echo('statistics:global'))
+  ->setSubject($group->name. ' ' .elgg_echo('statistics:global'))
+  ->setDescription($group->name. ' ' .elgg_echo('statistics:global'));
 
+  $output->setActiveSheetIndex(0);
+
+  $tools = elgg_get_config('group_tool_options');
+  $items = array();
+  if(is_array($tools)){
+    foreach($tools as $tool){
+      $tool_name = $tool->name."_enable";
+      if($group->$tool_name == 'yes' && $tool->name !='activity'){
+        $items=array_merge($items,statistics_extended_tool_object($tool->name));
+      }
+    }
+  }
   $options = array('types'=>'user',
       'count'=>true,
       'limit'=>50,
@@ -21,60 +36,36 @@ function statistics_extended_export_group_global_data($group,$cached=false){
   $options['count']=false;
 
   if($count>0){
-    $headers = array("guid","name","email","country","actor_type","experience_theme","internal","blog","file","bookmark","event","discussion","page");
+    $headers = array("guid","name","email");
+    $headers = array_merge($headers,$items);
+    unset($headers[current(array_keys($headers,'page_top'))]);
     $headers = statistics_extended_label_generator($headers,null,"statistics:groups:member:");
-    $resp=implode(",",array_map('elgg_echo',$headers))."\n";
-    for($i=0;$i<$count;$i+=50){
+    $headers=array_map('elgg_echo',$headers);
+    statistics_extended_export_generate_cell($output,$headers);
+    for($i=0,$j=2;$i<$count;$i+=50){
       $options['offset']=$i;
       $entities = elgg_get_entities_from_relationship($options);
       if(!empty($entities)){
         foreach($entities as $entity){
           $row = array();
           $row[]=$entity->guid;
-          $name= mb_convert_encoding($entity->name, 'UTF-16LE', 'UTF-8');
-          $row[]="\"$name\"";
+          $row[]=$entity->name;
           $email = (!empty($entity->contactemail)) ? $entity->contactemail : $entity->email;
           $row[]=$email;
 
-          $location_var = "cfkn_mpr:country";
-          $country = elgg_echo($entity->$location_var);
-          $country= mb_convert_encoding($country, 'UTF-16LE', 'UTF-8');
-          $row[]=$country;
-
-          $actor_type = "cfkn_mpr:actor_type";
-          $actor = elgg_echo($entity->$actor_type);
-          $actor= mb_convert_encoding($actor, 'UTF-16LE', 'UTF-8');
-          $row[]=$actor;
-
-          $experience_theme = "cfkn_mpr:experience_theme";
-          $experience_theme = elgg_echo($entity->$experience_theme);
-          $experience_theme= mb_convert_encoding($experience_theme, 'UTF-16LE', 'UTF-8');
-          $row[]=$experience_theme;
-
-
-          $internal = elgg_echo("option:no");
-          if(strpos($email,"@iadb.org")>0){
-            $internal = elgg_echo("option:yes");
-          }
-          $row[] = $internal;
-
           $values = statistics_extended_objects_count($items,$group->guid,$entity->guid);
           $values["page"]+=$values["page_top"];
-          array_pop($values);
+          unset($values['page_top']);
 
-          foreach($values as $key=>$value){
-            $row[]=$value;
-            $total_var_name = "{$key}_count_total";
-            $$total_var_name+=$value;
-          }
-          $resp.=implode(",",$row)."\n";
+          $row = array_merge($row,array_values($values));
+
+          statistics_extended_export_generate_cell($output,$row,$j);
+          $j++;
         }
       }
     }
-    $page_count_total+=$page_top_count_total;
-    $resp.=",,,,,,,$blog_count_total,$file_count_total,$bookmarks_count_total,$event_calendar_count_total,$groupforumtopic_count_total,$page_count_total\n";
   }
-  return $resp;
+  return $output;
 }
 
 /**
@@ -84,20 +75,29 @@ function statistics_extended_export_group_global_data($group,$cached=false){
  */
 function statistics_extended_export_group_resources_data($group){
   //TODO Migrate this to PHPExcel
-  $resp = "";
+  $output = new PHPExcel();
+  $output->getProperties()->setCreator(elgg_get_site_entity()->name)
+  ->setLastModifiedBy(elgg_get_site_entity()->name)
+  ->setTitle($group->name. ' ' .elgg_echo('statistics:resources'))
+  ->setSubject($group->name. ' ' .elgg_echo('statistics:resources'))
+  ->setDescription($group->name. ' ' .elgg_echo('statistics:resources'));
+
+  $output->setActiveSheetIndex(0);
+
   $options = array('types'=>'object',
       'count'=>true,
       'limit'=>50,
       "container_guids"=>$group->guid);
 
-  //$count = elgg_get_entities($options);
   $count = get_entities_by_views_counter($options);
   $options['count']=false;
   if($count>0){
     $headers = array("guid","type","title","user","visits");
     $headers = statistics_extended_label_generator($headers,null,"statistics:groups:resources:");
-    $resp=implode(",",array_map('elgg_echo',$headers))."\n";
-    for($i=0;$i<$count;$i+=50){
+    $headers=array_map('elgg_echo',$headers);
+    statistics_extended_export_generate_cell($output,$headers);
+
+    for($i=0,$k=2;$i<$count;$i+=50){
       $options['offset']=$i;
       $entities = get_entities_by_views_counter($options);
       if(!empty($entities)){
@@ -111,12 +111,11 @@ function statistics_extended_export_group_resources_data($group){
                   $row = array();
                   $row[]=$entity->guid;
                   $row[]=elgg_echo("statistics:label:type:".$entity->getSubtype());
-                  $title= mb_convert_encoding($entity->title, 'UTF-16LE', 'UTF-8');
-                  $row[]="\"".$title."\"";
-                  $visitor_name= mb_convert_encoding($visitor->getOwnerEntity()->name, 'UTF-16LE', 'UTF-8');
-                  $row[]="\"".$visitor_name."\"";
+                  $row[]=$entity->title;
+                  $row[]=$visitor->getOwnerEntity()->name;
                   $row[]=$visitor->value;
-                  $resp.=implode(",",$row)."\n";
+                  statistics_extended_export_generate_cell($output,$row,$k);
+                  $k++;
                 }
               }
             }
@@ -126,17 +125,17 @@ function statistics_extended_export_group_resources_data($group){
             $row = array();
             $row[]=$entity->guid;
             $row[]=elgg_echo("statistics:label:type:".$entity->getSubtype());
-            $title= mb_convert_encoding($entity->title, 'UTF-16LE', 'UTF-8');
-            $row[]="\"".$title."\"";
+            $row[]=$entity->title;
             $row[]="";
             $row[]=0;
-            $resp.=implode(",",$row)."\n";
+            statistics_extended_export_generate_cell($output,$row,$k);
+            $k++;
           }
         }
       }
     }
   }
-  return $resp;
+  return $output;
 }
 
 /**

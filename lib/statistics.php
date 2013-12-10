@@ -1,31 +1,5 @@
 <?php
 
-/**
- * Return the number of internal and external users in the site.
- *
- * If a group is specified the query is restricted to that group only
- *
- * @param $group optional group id
- * @return mixed an array (members_count,non_members_count)
- */
-function statistics_extended_members_count($group=null){
-	global $CONFIG;
-	$query_tpl ="SELECT COUNT(*) as members FROM {$CONFIG->dbprefix}users_entity WHERE ";
-	if(!empty($group)){
-		$query_tpl.=" guid IN (SELECT guid_one FROM {$CONFIG->dbprefix}entity_relationships WHERE relationship='member' AND guid_two={$group}) AND ";
-	}
-	$query_tpl.=" email {{CONDITION}} '%iadb.org'";
-	// IADB Users
-	$query = str_replace("{{CONDITION}}","LIKE",$query_tpl);
-	$count = get_data_row($query);
-	$members = $count->members;
-
-	$query = str_replace("{{CONDITION}}","NOT LIKE",$query_tpl);
-	$count = get_data_row($query);
-	$notmembers = $count->members;
-
-	return array($members,$notmembers);
-}
 
 /**
  * Return the number of active and inactive users in the site.
@@ -329,4 +303,26 @@ function statistics_extended_label_generator($labels,$values=array(),$prefix="st
 		}
 	}
 	return $resp;
+}
+
+function statistics_extended_tool_object($tool_name){
+  $resp = array();
+  switch($tool_name){
+  	case 'forum':
+  	  $resp[]='groupforumtopic';
+  	  break;
+  	case 'pages':
+  	  $resp[]='page';
+  	  $resp[]='page_top';
+  	  break;
+  	case 'photos':
+  	  $resp[]='album';
+  	  break;
+  	case 'polls':
+  	  $resp[]='poll';
+  	  break;
+  	default:
+  	  $resp[]=$tool_name;
+  }
+  return $resp;
 }

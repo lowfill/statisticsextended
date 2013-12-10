@@ -7,24 +7,39 @@
  * @link http://lowfill.org
  */
 
-  statistics_extended_load_library();
+  elgg_load_library('statistics_extended:lib');
 
-  $group = get_input("group_guid");
+  elgg_load_css('statistics_extended:css');
+
+  $group = $vars["group_guid"];
+  $group_entity = get_entity($group);
 
   //Resources data
   $resources = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+  $tools = elgg_get_config('group_tool_options');
+  $resources = array();
+  if(is_array($tools)){
+    foreach($tools as $tool){
+      $tool_name = $tool->name."_enable";
+      if($group_entity->$tool_name == 'yes' && $tool->name !='activity'){
+        $resources=array_merge($resources,statistics_extended_tool_object($tool->name));
+      }
+    }
+  }
+
   $resources_totals = statistics_extended_objects_view_count($resources,$group);
   $resources_totals["page"]+=$resources_totals["page_top"];
 
-  array_pop($resources);
-  array_pop($resources_totals);
+  unset($resources[current(array_keys($resources,'page_top'))]);
+  unset($resources_totals['page_top']);
+
   $resources_labels = statistics_extended_label_generator($resources,$resources_totals,'statistics:label:type:');
 
 ?>
 <div id="statistics_group_graphs" align="center">
 <?php echo elgg_view("output/bar",array("internalname"=>'statistics_group_resources_graph',
 										"class"=>"statistics_graph",
-										"size"=>"500x250",
+										"size"=>"600x250",
 										"title"=>elgg_echo("statistics:resources_views"),
                                         "labels"=>$resources_labels,
 										"values"=>$resources_totals))?>
