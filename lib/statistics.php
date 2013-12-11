@@ -31,6 +31,32 @@ function statistics_extended_active_count($group=null){
 }
 
 /**
+ * Return the users count for each value associated with the metadata provided
+ *
+ * @param string $metadata
+ * @return array
+ */
+function statistics_extended_users_metadata_count($metadata){
+  $sector_metadata = get_metastring_id($metadata);
+  $dbprefix = elgg_get_config('dbprefix');
+
+  $query = "SELECT mv.string AS data, count(*) as total ";
+  $query .= "FROM {$dbprefix}users_entity ue ";
+  $query .= "JOIN {$dbprefix}metadata m ON ue.guid = m.entity_guid ";
+  $query .= "JOIN {$dbprefix}metastrings mv ON m.value_id = mv.id ";
+  $query .= "WHERE m.name_id = {$sector_metadata} ";
+  $query .= "GROUP BY data";
+  $resp = array();
+  $entities = get_data($query);
+  if (! empty($entities)) {
+    foreach ( $entities as $entity ) {
+      $resp[$entity->data] = $entity->total;
+    }
+  }
+  return $resp;
+}
+
+/**
  * Return the number of visits made from group members
  * @param $group group
  * @return integer
@@ -305,6 +331,11 @@ function statistics_extended_label_generator($labels,$values=array(),$prefix="st
 	return $resp;
 }
 
+/**
+ * Return the list of objets related with an specific tool
+ * @param string $tool_name
+ * @return array
+ */
 function statistics_extended_tool_object($tool_name){
   $resp = array();
   switch($tool_name){
@@ -320,6 +351,10 @@ function statistics_extended_tool_object($tool_name){
   	  break;
   	case 'polls':
   	  $resp[]='poll';
+  	  break;
+  	case 'chat':
+  	case 'chat_members':
+  	  //We don't have information about chats
   	  break;
   	default:
   	  $resp[]=$tool_name;
