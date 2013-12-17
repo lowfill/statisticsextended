@@ -82,6 +82,9 @@ function statistics_extended_groups_statistics($group_guid,$section='index',$ite
     $body = "<p>".elgg_echo("statistics:error:not_access")."</p>";
   }
 
+  elgg_push_breadcrumb(page_owner_entity()->name,page_owner_entity()->getURL());
+  elgg_push_breadcrumb(elgg_echo('statistics:groups:manager'));
+
   $title = elgg_echo('statistics:groups:manager');
 
   $filter = elgg_view('statistics/groups/filter',array('selected'=>$section,'group_guid'=>$group_guid));
