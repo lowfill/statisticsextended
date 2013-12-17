@@ -23,4 +23,10 @@
 		<plugin>libform_utils</plugin>
 		<priority>after</priority>
 	</requires>
+	    <requires>
+		<type>priority</type>
+		<plugin>views_counter</plugin>
+		<priority>after</priority>
+	</requires>
+	
 </plugin_manifest>

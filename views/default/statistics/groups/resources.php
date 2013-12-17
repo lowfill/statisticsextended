@@ -28,11 +28,12 @@
   }
 
   $resources_totals = statistics_extended_objects_view_count($resources,$group);
-  $resources_totals["page"]+=$resources_totals["page_top"];
+  if(array_key_exists('page',$resources_totals)){
+    $resources_totals["page"]+=$resources_totals["page_top"];
 
-  unset($resources[current(array_keys($resources,'page_top'))]);
-  unset($resources_totals['page_top']);
-
+    unset($resources[current(array_keys($resources,'page_top'))]);
+    unset($resources_totals['page_top']);
+  }
   $resources_labels = statistics_extended_label_generator($resources,$resources_totals,'statistics:label:type:');
 
 ?>

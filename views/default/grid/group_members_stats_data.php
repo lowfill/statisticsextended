@@ -36,7 +36,8 @@ $options['count']=false;
 $options['limit']=$rp;
 $options['offset']=$start;
 if(!empty($sortname)){
-	$options['order_by']="$sortname $sortorder";
+	$options['order_by_metadata']=array('name'=>$sortname,'direction'=>$sortorder);
+
 }
 $entities = elgg_get_entities_from_relationship($options);
 
@@ -65,12 +66,13 @@ if(!empty($entities)){
 		$name = mb_convert_case("$entity->name",MB_CASE_TITLE,'UTF-8');
 		$name = "<a href=\"{$entity->getUrl()}\">$name</a>";
 		$email = (!empty($entity->contactemail)) ? $entity->contactemail : $entity->email;
+		$location = $entity->location;
 
 		$values = statistics_extended_objects_count($items,$group,$entity->guid);
 		$values["page"]+=$values["page_top"];
 		unset($values['page_top']);
 
-		$row['cell']=array($name);
+		$row['cell']=array($name,$location);
 		foreach($values as $value){
 			$row['cell'][]=$value;
 		}

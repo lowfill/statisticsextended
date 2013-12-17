@@ -18,5 +18,6 @@ if(empty($title)){
 else{
 	$title = sprintf(elgg_echo("statistics:visitits_detail"),$title);
 }
-echo "<h2>{$title}</h2>";
+echo "<h2><a href='{$entity->getURL()}' target='_blank'>{$title}</a></h2>";
+echo "<br>";
 echo elgg_view('admin/advanced_statistics/views_statistics',array('entity'=>$entity));

@@ -30,13 +30,17 @@ function statistics_extended_active_count($group=null){
 	return array($active,$inactive);
 }
 
+function statistics_extended_location_count($group){
+  return statistics_extended_users_metadata_count('location',$group);
+}
+
 /**
  * Return the users count for each value associated with the metadata provided
  *
  * @param string $metadata
  * @return array
  */
-function statistics_extended_users_metadata_count($metadata){
+function statistics_extended_users_metadata_count($metadata,$group=null){
   $sector_metadata = get_metastring_id($metadata);
   $dbprefix = elgg_get_config('dbprefix');
 
@@ -45,6 +49,10 @@ function statistics_extended_users_metadata_count($metadata){
   $query .= "JOIN {$dbprefix}metadata m ON ue.guid = m.entity_guid ";
   $query .= "JOIN {$dbprefix}metastrings mv ON m.value_id = mv.id ";
   $query .= "WHERE m.name_id = {$sector_metadata} ";
+  if(!empty($group)){
+    $query.="AND ue.guid IN (SELECT guid_one FROM {$dbprefix}entity_relationships WHERE relationship='member' AND guid_two={$group}) ";
+  }
+
   $query .= "GROUP BY data";
   $resp = array();
   $entities = get_data($query);
@@ -190,7 +198,7 @@ function statistics_extended_object_count($object_type,$owner_guid,$container_gu
 	$options = array(
 		'types'=>'object',
 		'subtypes'=>$object_type,
-		'count'=>true
+		'count'=>true,
 	);
 	if($owner_guid!=null){
 		$options['owner_guids']=$owner_guid;

@@ -36,11 +36,14 @@ function statistics_extended_export_group_global_data($group,$cached=false){
   $options['count']=false;
 
   if($count>0){
-    $headers = array("guid","name","email");
+    $headers = array("guid","name","email","location");
     $headers = array_merge($headers,$items);
-    unset($headers[current(array_keys($headers,'page_top'))]);
+    if(in_array('page',$items)){
+      unset($headers[current(array_keys($headers,'page_top'))]);
+    }
     $headers = statistics_extended_label_generator($headers,null,"statistics:groups:member:");
     $headers=array_map('elgg_echo',$headers);
+
     statistics_extended_export_generate_cell($output,$headers);
     for($i=0,$j=2;$i<$count;$i+=50){
       $options['offset']=$i;
@@ -52,10 +55,13 @@ function statistics_extended_export_group_global_data($group,$cached=false){
           $row[]=$entity->name;
           $email = (!empty($entity->contactemail)) ? $entity->contactemail : $entity->email;
           $row[]=$email;
+          $row[]=$entity->location;
 
           $values = statistics_extended_objects_count($items,$group->guid,$entity->guid);
-          $values["page"]+=$values["page_top"];
-          unset($values['page_top']);
+          if(array_key_exists('page',$values)){
+            $values["page"]+=$values["page_top"];
+            unset($values['page_top']);
+          }
 
           $row = array_merge($row,array_values($values));
 
@@ -69,12 +75,11 @@ function statistics_extended_export_group_global_data($group,$cached=false){
 }
 
 /**
- * Returns a CSV string with the group resources information
+ * Returns a Excel with the group resources information
  * @param $group
  * @return string
  */
 function statistics_extended_export_group_resources_data($group){
-  //TODO Migrate this to PHPExcel
   $output = new PHPExcel();
   $output->getProperties()->setCreator(elgg_get_site_entity()->name)
   ->setLastModifiedBy(elgg_get_site_entity()->name)

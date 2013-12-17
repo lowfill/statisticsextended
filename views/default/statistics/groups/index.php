@@ -35,21 +35,22 @@
      }
   }
   $resources_totals = statistics_extended_objects_count($resources,$group);
-  $resources_totals["page"]+=$resources_totals["page_top"];
-
-  unset($resources[current(array_keys($resources,'page_top'))]);
-  unset($resources_totals['page_top']);
+  if(array_key_exists('page', $resources_totals)){
+    $resources_totals["page"]+=$resources_totals["page_top"];
+    unset($resources[current(array_keys($resources,'page_top'))]);
+    unset($resources_totals['page_top']);
+  }
   $resources_labels = statistics_extended_label_generator($resources,$resources_totals);
 
 ?>
-<h2><?php echo sprintf(elgg_echo("statistics:groups:visits"),$visits_count)?>  <small>[<a href="<?php echo $vars["url"]?>pg/group_statistics/<?php echo $group;?>/details"><?php echo elgg_echo("details")?></a>]</small></h2>
+<h2><?php echo sprintf(elgg_echo("statistics:groups:visits"),$visits_count)?>  <small>[<a href="<?php echo $vars["url"]?>pg/group_statistics/<?php echo $group;?>/details"><?php echo elgg_echo("statistics:details")?></a>]</small></h2>
 <h2><?php echo sprintf(elgg_echo("statistics:groups:members:visits"),$member_visits_count)?></h2>
 <br>
 <div id="statistics_group_graphs">
 
 <?php echo elgg_view("output/pie",array("internalname"=>'statistics_group_active_graph',
 										"class"=>"statistics_graph",
-										"size"=>"300x120",
+										"size"=>"400x120",
 										"title"=>elgg_echo("statistics:members"),
                                         "labels"=>$active_labels,
 										"values"=>$active_totals))?>
@@ -79,6 +80,13 @@ $column_config[]=array('display'=>elgg_echo("statistics:groups:member:name"),
 	'width'=> 180,
 	'sortable'=>false,
 	'align'=>'center'
+);
+
+$column_config[]=array('display'=>elgg_echo("statistics:groups:member:location"),
+    'name'=>'location',
+    'width'=> 100,
+    'sortable'=>true,
+    'align'=>'center'
 );
 
 foreach($resources as $resource){

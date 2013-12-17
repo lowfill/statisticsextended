@@ -4,6 +4,7 @@ $english = array(
 	'statistics:global'=>"Global",
 	'statistics:resources'=>"Resources",
 	'statistics:members'=>"Members",
+    'statistics:members:location'=>"Members location",
 	'statistics:evolution'=>"Evolution",
 	'statistics:resources_views'=>"Resources views",
 	'statistics:details'=>"Details",
@@ -35,6 +36,7 @@ $english = array(
     'statistics:groups:member:image'=>"Images",
     'statistics:groups:member:poll'=>"Polls",
     'statistics:groups:member:album'=>"Albumns",
+    'statistics:groups:member:location'=>"Location",
 
 
 	'statistics:global:member:guid'=>"Guid",
