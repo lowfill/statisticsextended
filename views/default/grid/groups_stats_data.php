@@ -41,36 +41,36 @@ header("Cache-Control: no-cache, must-revalidate" );
 header("Pragma: no-cache" );
 header("Content-type: text/x-json");
 
-$items = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+$tools = elgg_get_config('group_tool_options');
+$items = array();
+if(is_array($tools)){
+  foreach($tools as $tool){
+    if($tool->name!='activity'){
+      $items=array_merge($items,statistics_extended_tool_object($tool->name));
+    }
+  }
+}
 
 $rows = array();
 if(!empty($entities)){
 	foreach($entities as $entity){
 		$row = array();
 		$row['id']=$entity->guid;
-		$name = mb_convert_case("$entity->name",MB_CASE_TITLE,'UTF-8');
+		$name = $entity->name;
 		$name = "<a href=\"{$entity->getUrl()}\">$name</a>";
-		$type = elgg_echo($entity->group_type);
-		$organizational_unit=str_replace("||"," ",$entity->organizational_unit);
-
-		list($internal,$external) = statistics_extended_members_count($entity->guid);
-
-		$status = $entity->group_status;
-		if(empty($status)){
-			$status = "active";
-		}
-		$status = elgg_echo("groups:extras:status:$status");
 
 		$access = "<input type=\"checkbox\" disabled=\"disabled\" >";
-		if($entity->content_privacy=="yes"){
+		if($entity->membership==ACCESS_PUBLIC){
 			$access = "<input type=\"checkbox\" disabled=\"disabled\" checked=\"checked\">";
 		}
 
 		$values = statistics_extended_objects_count($items,$entity->guid);
-		$values["page"]+=$values["page_top"];
-		array_pop($values);
+		if(array_key_exists('page',$values)){
+    	  $values["page"]+=$values["page_top"];
+  		  unset($values['page_top']);
+		}
 
-		$row['cell']=array($name,$type,$organizational_unit,$internal,$external,$status,$access);
+		$row['cell']=array($name,$access);
 		foreach($values as $value){
 			$row['cell'][]=$value;
 		}

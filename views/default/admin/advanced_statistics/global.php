@@ -4,11 +4,6 @@
 
   $users = elgg_get_entities(array('types'=>'user','count'=>true));
 
-  //Members data
-  $members = array("internal","external");
-  list($internal,$external) = statistics_extended_members_count();
-  $members_totals = array("internal"=>$internal,"external"=>$external);
-  $members_labels = statistics_extended_label_generator($members,$members_totals);
 
   $active_labels = array("active","inactive");
   list($active,$inactive) = statistics_extended_active_count();
@@ -16,33 +11,28 @@
   $active_labels = statistics_extended_label_generator($active_labels,$active_totals);
 
   //Resources data
-  $resources_tpl = array();
-  $resources_tpl = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+  $tools = elgg_get_config('group_tool_options');
   $resources = array();
-  foreach($resources_tpl as $resource){
-    if(get_subtype_id('object', $resource)!=''){
-      $resources[]=$resource;
+  if(is_array($tools)){
+    foreach($tools as $tool){
+      if($tool->name!='activity'){
+        $resources=array_merge($resources,statistics_extended_tool_object($tool->name));
+      }
     }
   }
-  $resources_totals = statistics_extended_objects_count($resources);
-  $resources_totals["page"]+=$resources_totals["page_top"];
 
-  array_pop($resources);
-  array_pop($resources_totals);
+  $resources_totals = statistics_extended_objects_count($resources);
+  if(array_key_exists('page', $resources_totals)){
+    $resources_totals["page"]+=$resources_totals["page_top"];
+    unset($resources[current(array_keys($resources,'page_top'))]);
+    unset($resources_totals['page_top']);
+  }
   $resources_labels = statistics_extended_label_generator($resources,$resources_totals);
 
 ?>
 <h2><?php echo sprintf(elgg_echo("statistics:users:counter"),$users)?></h2>
 
 <div id="statistics_group_graphs">
-<?php echo elgg_view("output/pie",array("internalname"=>'statistics_group_users_graph',
-										"class"=>"statistics_graph",
-										"size"=>"300x100",
-										"title"=>elgg_echo("statistics:members"),
-                                        "labels"=>$members_labels,
-										"values"=>$members_totals))
-
-?>
 
 <?php echo elgg_view("output/pie",array("internalname"=>'statistics_users_graph',
 										"class"=>"statistics_graph",
@@ -61,14 +51,16 @@
 ?>
 </div>
 
-<div class="clear"></div>
+<div class="clearfloat"></div>
 <div class="statistics_buttons">
 <?php
   $url = $vars['url']."action/export/global/?type=global";
   $url = elgg_add_action_tokens_to_url($url);
+  if($user < 7000){
 ?>
 <a href="<?php echo $url?>"><?php echo elgg_echo("export")?></a>
 </div>
+<?php }?>
 <div class="clear"></div>
 
 <?php
@@ -87,53 +79,17 @@ $column_config[]=array('display'=>elgg_echo("statistics:global:member:location")
 	'align'=>'center'
 );
 
-$column_config[]=array('display'=>elgg_echo("statistics:global:member:internal"),
-	'name'=>'internal',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo('statistics:global:member:blog'),
-	'name'=>'blog',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo('statistics:global:member:file'),
-	'name'=>'file',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
+foreach($resources as $resource){
+  $column_config[]=array('display'=>elgg_echo('statistics:global:member:'.$resource),
+      'name'=>$resource,
+      'width'=> 40,
+      'sortable'=>false,
+      'align'=>'center'
+  );
+}
 
-$column_config[]=array('display'=>elgg_echo('statistics:global:member:bookmark'),
-	'name'=>'bookmark',
-	'width'=> 70,
-	'sortable'=>false,
-	'align'=>'center'
-);
 
-$column_config[]=array('display'=>elgg_echo('statistics:global:member:event'),
-	'name'=>'event',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-
-$column_config[]=array('display'=>elgg_echo('statistics:global:member:discussion'),
-	'name'=>'discussion',
-	'width'=> 70,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo('statistics:global:member:page'),
-	'name'=>'page',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-
-echo elgg_view("output/grid",array('internalname'=>'statistics_users_global',
+ echo elgg_view("output/grid",array('internalname'=>'statistics_users_global',
                                    'endpoint'=>'users_stats',
 								   'column_configuration'=>$column_config,
 								   'width'=>'auto',

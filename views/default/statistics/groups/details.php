@@ -6,6 +6,9 @@
  * @author Diego Ramirez <dramirezaragon@gmail.com>
  * @link http://lowfill.org
  */
+
+elgg_load_css('statistics_extended:css');
+
 $entity = $vars['item_guid'];
 if(empty($entity)){
 	$entity = $vars["group_guid"];

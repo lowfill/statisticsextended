@@ -11,19 +11,29 @@
   statistics_extended_load_library();
 
   //Resources data
-  $resources = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+  $tools = elgg_get_config('group_tool_options');
+  $resources = array();
+  if(is_array($tools)){
+    foreach($tools as $tool){
+      if($tool->name!='activity'){
+        $resources=array_merge($resources,statistics_extended_tool_object($tool->name));
+      }
+    }
+  }
+
   $resources_totals = statistics_extended_objects_count($resources);
-  $resources_totals["page"]+=$resources_totals["page_top"];
-  array_pop($resources);
-  array_pop($resources_totals);
+  $resources_views_totals = statistics_extended_objects_view_count($resources);
+
+  if(in_array('page',$resources)){
+    $resources_totals["page"]+=$resources_totals["page_top"];
+    $resources_views_totals["page"]+=$resources_views_totals["page_top"];
+
+    unset($resources[current(array_keys($resources,'page_top'))]);
+    unset($resources_totals['page_top']);
+    unset($resources_views_totals['page_top']);
+  }
+
   $resources_labels = statistics_extended_label_generator($resources,$resources_totals,'statistics:label:type:');
-
-  $resources_views = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
-  $resources_views_totals = statistics_extended_objects_view_count($resources_views);
-  $resources_views_totals["page"]+=$resources_views_totals["page_top"];
-
-  array_pop($resources_views);
-  array_pop($resources_views_totals);
   $resources_views_labels = statistics_extended_label_generator($resources_views,$resources_views_totals,'statistics:label:type:');
 
 ?>

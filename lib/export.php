@@ -232,7 +232,17 @@ function statistics_extended_export_global_data($cached=false){
 
   $output->setActiveSheetIndex(0);
 
-  $items = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+  $tools = elgg_get_config('group_tool_options');
+  $items = array();
+  if(is_array($tools)){
+    foreach($tools as $tool){
+      $tool_name = $tool->name."_enable";
+      if($group->$tool_name == 'yes' && $tool->name !='activity'){
+        $items=array_merge($items,statistics_extended_tool_object($tool->name));
+      }
+    }
+  }
+
 
   $options = array('types'=>'user',
       'count'=>true,
@@ -280,14 +290,31 @@ function statistics_extended_export_global_data($cached=false){
 }
 
 /**
- * Return a CSV string with the global information for groups
+ * Return a Excel file with the global information for groups
  * @param $cached
  * @return string
  */
 function statistics_extended_export_global_group_data($cached=false){
-  //TODO Migrate this to PHPExcel
-  $resp = "";
-  $items = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+  $output = new PHPExcel();
+  $output->getProperties()->setCreator(elgg_get_site_entity()->name)
+  ->setLastModifiedBy(elgg_get_site_entity()->name)
+  ->setTitle(elgg_echo('statistics:global'))
+  ->setSubject(elgg_echo('statistics:global'))
+  ->setDescription(elgg_echo('statistics:global'));
+
+  $output->setActiveSheetIndex(0);
+
+  $tools = elgg_get_config('group_tool_options');
+  $items = array();
+  if(is_array($tools)){
+    foreach($tools as $tool){
+      $tool_name = $tool->name."_enable";
+      if($group->$tool_name == 'yes' && $tool->name !='activity'){
+        $items=array_merge($items,statistics_extended_tool_object($tool->name));
+      }
+    }
+  }
+
 
   $options = array('types'=>'group',
       'count'=>true);
@@ -297,10 +324,13 @@ function statistics_extended_export_global_group_data($cached=false){
   $options['limit']=50;
 
   if($count>0){
+    //TODO Remove outdated data
     $headers = array("guid","name","type","section","department","unit","impact_contribution","impact_contribution_category","status","access","blog","file","bookmark","event","discussion","page");
     $headers = statistics_extended_label_generator($headers,null,"statistics:global:groups:");
-    $resp=implode(",",array_map('elgg_echo',$headers))."\n";
-    for($i=0;$i<$count;$i+=50){
+    $headers=array_map('elgg_echo',$headers);
+    statistics_extended_export_generate_cell($output,$headers);
+
+    for($i=0,$j=2;$i<$count;$i+=50){
       $options['offset']=$i;
       $entities = elgg_get_entities($options);
       if(!empty($entities)){
@@ -355,17 +385,14 @@ function statistics_extended_export_global_group_data($cached=false){
           $values["page"]+=$values["page_top"];
           array_pop($values);
 
-          foreach($values as $key=>$value){
-            $row[]=$value;
-            $total_var_name = "{$key}_count_total";
-            $$total_var_name+=$value;
-          }
-          $resp.=implode(",",$row)."\n";
+          statistics_extended_export_generate_cell($output,$row,$j);
+          $j++;
+
         }
       }
     }
   }
-  return $resp;
+  return $output;
 }
 
 function statistics_extended_export_generate_cell(&$output,$values,$row=1){

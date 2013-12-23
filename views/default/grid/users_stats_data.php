@@ -41,7 +41,16 @@ header("Cache-Control: no-cache, must-revalidate" );
 header("Pragma: no-cache" );
 header("Content-type: text/x-json");
 
-$items = array("blog","file","bookmarks","event_calendar","groupforumtopic","page","page_top");
+$tools = elgg_get_config('group_tool_options');
+$items = array();
+if(is_array($tools)){
+  foreach($tools as $tool){
+    if($tool->name!='activity'){
+      $items=array_merge($items,statistics_extended_tool_object($tool->name));
+    }
+  }
+}
+
 
 $rows = array();
 if(!empty($entities)){
@@ -52,17 +61,15 @@ if(!empty($entities)){
 		$name = "<a href=\"{$entity->getUrl()}\">$name</a>";
 		$email = (!empty($entity->contactemail)) ? $entity->contactemail : $entity->email;
 
-		$internal = "<input type=\"checkbox\" disabled=\"disabled\" >";
-		if(strpos($email,"@iadb.org")>0){
-			$internal = "<input type=\"checkbox\" disabled=\"disabled\" checked=\"checked\">";
-		}
-
 		$location = str_replace("||",",",$entity->location);
 		$values = statistics_extended_objects_count($items,null,$entity->guid);
-		$values["page"]+=$values["page_top"];
-		array_pop($values);
 
-		$row['cell']=array($name,$location,$internal);
+		if(array_key_exists('page',$values)){
+    	  $values["page"]+=$values["page_top"];
+  		  unset($values['page_top']);
+		}
+
+		$row['cell']=array($name,$location);
 		foreach($values as $value){
 			$row['cell'][]=$value;
 		}

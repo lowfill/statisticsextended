@@ -8,91 +8,38 @@
  */
 
   elgg_load_css('statistics_extended:css');
-  statistics_extended_load_library();
+  elgg_load_library('statistics_extended:lib');
 
   $groups = elgg_get_entities(array('types'=>'group','count'=>true));
-
-  list($group_types,$group_types_totals) = statistics_extended_groups_property_count("group_type");
-  $group_types = statistics_extended_label_generator($group_types,$group_types_totals);
-
-  list($organizational_unit_types,$organizational_unit_totals) = statistics_extended_groups_property_count("organizational_unit");
-  $organizational_unit_types = statistics_extended_label_generator($organizational_unit_types,$organizational_unit_totals,"");
-
-  list($impact_contribution_types,$impact_contribution_totals) = statistics_extended_groups_property_count("impact_contribution");
-  $impact_contribution_types = statistics_extended_label_generator($impact_contribution_types,$impact_contribution_totals);
-
-  list($impact_contribution_category_types,$impact_contribution_category_totals) = statistics_extended_groups_property_count("impact_contribution_category");
-  $impact_contribution_category_types = statistics_extended_label_generator($impact_contribution_category_types,$impact_contribution_category_totals);
-
-  list($public_types,$public_totals) = statistics_extended_groups_property_count("content_privacy");
-  $public_types = statistics_extended_label_generator($public_types,$public_totals);
 
   list($access_types,$access_totals) = statistics_extended_groups_property_count("membership");
   $access_types = statistics_extended_label_generator($access_types,$access_totals);
 
-  list($status_types,$status_totals) = statistics_extended_groups_property_count("group_status");
-  $status_types = statistics_extended_label_generator($status_types,$status_totals);
+  //Resources data
+  $tools = elgg_get_config('group_tool_options');
+  $resources = array();
+  if(is_array($tools)){
+    foreach($tools as $tool){
+      if($tool->name!='activity'){
+        $resources=array_merge($resources,statistics_extended_tool_object($tool->name));
+      }
+    }
+  }
 
-  //TODO Change the id container for custom CSS layout
+  if(in_array('page', $resources)){
+    unset($resources[current(array_keys($resources,'page_top'))]);
+  }
+
 ?>
 <h2><?php echo sprintf(elgg_echo("statistics:groups:counter"),$groups)?></h2>
 <div id="statistics_group_graphs">
-<?php echo elgg_view("output/pie",array("internalname"=>'statistics_groups_types_graph',
-										"class"=>"statistics_graph",
-										"size"=>"320x130",
-										"title"=>elgg_echo("statistics:groups:types"),
-                                        "legends"=>$group_types,
-										"values"=>$group_types_totals));
 
-?>
-
-<?php  echo elgg_view("output/pie",array("internalname"=>'statistics_groups_organizational_unit_graph',
-										"class"=>"statistics_graph",
-										"size"=>"320x130",
-										"title"=>elgg_echo("statistics:organizational_unit"),
-										"legends"=>$organizational_unit_types,
-										"values"=>$organizational_unit_totals));
-
-?>
-<?php  echo elgg_view("output/pie",array("internalname"=>'statistics_groups_impact_contribution_graph',
-										"class"=>"statistics_graph",
-										"size"=>"320x130",
-										"title"=>elgg_echo("statistics:impact_contribution"),
-										"legends"=>$impact_contribution_types,
-										"values"=>$impact_contribution_totals));
-
-?>
-<?php  echo elgg_view("output/pie",array("internalname"=>'statistics_groups_impact_contribution_category_graph',
-										"class"=>"statistics_graph",
-										"size"=>"320x130",
-										"title"=>elgg_echo("statistics:impact_contribution_category"),
-										"legends"=>$impact_contribution_category_types,
-										"values"=>$impact_contribution_category_totals));
-
-?>
-<?php  echo elgg_view("output/pie",array("internalname"=>'statistics_groups_public_graph',
-										"class"=>"statistics_graph",
-										"size"=>"180x100",
-										"title"=>elgg_echo("statistics:public"),
-										"legends"=>$public_types,
-										"values"=>$public_totals));
-
-?>
 <?php  echo elgg_view("output/pie",array("internalname"=>'statistics_groups_access_graph',
 										"class"=>"statistics_graph",
 										"size"=>"180x100",
 										"title"=>elgg_echo("statistics:access_membership"),
 										"legends"=>$access_types,
 										"values"=>$access_totals));
-
-?>
-
-<?php  echo elgg_view("output/pie",array("internalname"=>'statistics_groups_status_graph',
-										"class"=>"statistics_graph",
-										"size"=>"180x100",
-										"title"=>elgg_echo("statistics:status"),
-										"legends"=>$status_types,
-										"values"=>$status_totals));
 
 ?>
 
@@ -117,82 +64,22 @@ $column_config[]=array('display'=>elgg_echo("statistics:global:groups:name"),
 	'align'=>'center'
 );
 
-$column_config[]=array('display'=>elgg_echo("statistics:global:groups:type"),
-	'name'=>'type',
-	'width'=> 80,
-	'sortable'=>false,
-	'align'=>'center'
-);
-
-$column_config[]=array('display'=>elgg_echo("statistics:global:groups:organizational_unit"),
-	'name'=>'organizational_unit',
-	'width'=> 80,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo("statistics:global:groups:internal"),
-	'name'=>'internal',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo("statistics:global:groups:external"),
-	'name'=>'external',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo("statistics:global:groups:status"),
-	'name'=>'status',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
 $column_config[]=array('display'=>elgg_echo("statistics:global:groups:access"),
 	'name'=>'access',
 	'width'=> 40,
 	'sortable'=>false,
 	'align'=>'center'
 );
-$column_config[]=array('display'=>elgg_echo('statistics:global:groups:blog'),
-	'name'=>'blog',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo('statistics:global:groups:file'),
-	'name'=>'file',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
 
-$column_config[]=array('display'=>elgg_echo('statistics:global:groups:bookmark'),
-	'name'=>'bookmark',
-	'width'=> 70,
-	'sortable'=>false,
-	'align'=>'center'
-);
+foreach($resources as $resource){
+  $column_config[]=array('display'=>elgg_echo('statistics:global:member:'.$resource),
+      'name'=>$resource,
+      'width'=> 50,
+      'sortable'=>false,
+      'align'=>'center'
+  );
+}
 
-$column_config[]=array('display'=>elgg_echo('statistics:global:groups:event'),
-	'name'=>'event',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
-
-$column_config[]=array('display'=>elgg_echo('statistics:global:groups:discussion'),
-	'name'=>'discussion',
-	'width'=> 70,
-	'sortable'=>false,
-	'align'=>'center'
-);
-$column_config[]=array('display'=>elgg_echo('statistics:global:groups:page'),
-	'name'=>'page',
-	'width'=> 40,
-	'sortable'=>false,
-	'align'=>'center'
-);
 $column_config[]=array('display'=>"",
 	'name'=>'detail',
 	'width'=> 40,

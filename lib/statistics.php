@@ -171,18 +171,18 @@ function statistics_extended_groups_property_count($property){
 /**
  * Return an array with total number of objects from the specified subtypes
  *
- * @param $object_types array object subtypes
+ * @param $object_subtypes array object subtypes
  * @param $container_guid null or group_guid
  * @param $owner_guid null or owner_guid
  * @return array
  */
-function statistics_extended_objects_count($object_types,$container_guid=null,$owner_guid=null){
+function statistics_extended_objects_count($object_subtypes,$container_guid=null,$owner_guid=null,$object_type='object'){
 	if(!is_array($object_types)){
-		$object_types = array($object_types);
+		$object_types = array($object_subtypes);
 	}
 	$resp = array();
-	foreach($object_types as $object_type){
-		$resp[$object_type] = statistics_extended_object_count($object_type,$owner_guid,$container_guid);
+	foreach($object_subtypes as $object_subtype){
+		$resp[$object_subtype] = statistics_extended_object_count($object_subtype,$owner_guid,$container_guid,$object_type);
 	}
 	return $resp;
 }
@@ -194,10 +194,10 @@ function statistics_extended_objects_count($object_types,$container_guid=null,$o
  * @param $container_guid
  * @return int
  */
-function statistics_extended_object_count($object_type,$owner_guid,$container_guid=null){
+function statistics_extended_object_count($object_subtype,$owner_guid,$container_guid=null,$object_type='object'){
 	$options = array(
-		'types'=>'object',
-		'subtypes'=>$object_type,
+		'types'=>$object_type,
+		'subtypes'=>$object_subtype,
 		'count'=>true,
 	);
 	if($owner_guid!=null){
@@ -237,11 +237,12 @@ function statistics_extended_objects_view_count($object_types,$container_guid=nu
  * @return int
  */
 function statistics_extended_object_view_count($object_type,$owner_guid,$container_guid=null){
+    set_time_limit(0);
 	$options = array(
 		'types'=>'object',
 		'subtypes'=>$object_type,
 		'owner_guids'=>$owner_guid,
-		'count'=>true
+		'count'=>true,
 	);
 	if($container_guid!=null){
 		$options['container_guids']=$container_guid;

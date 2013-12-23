@@ -36,3 +36,6 @@
 #pie_container_statistics_group_resources_graph{
 	float:none;
 }
+.statistics-views-item{
+  list-style:none;
+}

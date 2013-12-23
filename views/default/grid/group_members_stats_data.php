@@ -69,8 +69,10 @@ if(!empty($entities)){
 		$location = $entity->location;
 
 		$values = statistics_extended_objects_count($items,$group,$entity->guid);
-		$values["page"]+=$values["page_top"];
-		unset($values['page_top']);
+		if(array_key_exists('page',$values)){
+    	  $values["page"]+=$values["page_top"];
+  		  unset($values['page_top']);
+		}
 
 		$row['cell']=array($name,$location);
 		foreach($values as $value){

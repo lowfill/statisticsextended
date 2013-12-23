@@ -58,7 +58,7 @@ if(!empty($entities)){
 		$name = "<a href=\"".$entity->getUrl()."\">$name</a>";
 
 		$visits = get_views_counter($entity->guid);
-		$detail = "<a href=\"{$CONFIG->url}pg/group_statistics/{$group}/details/{$entity->guid}\">".elgg_echo("statistics:details")."</a>";
+		$detail = "<a href=\"{$CONFIG->url}group_statistics/{$group}/details/{$entity->guid}\">".elgg_echo("statistics:details")."</a>";
 		$row['cell']=array(
 			$type,
 			$name,

@@ -29,10 +29,10 @@ function statistics_extended_pagesetup(){
 	global $CONFIG;
 
 	if (elgg_in_context('admin')) {
-		elgg_register_admin_menu_item('administer', 'global','advanced_statistics');
-		elgg_register_admin_menu_item('administer', 'groups','advanced_statistics');
-		elgg_register_admin_menu_item('administer', 'resources','advanced_statistics');
-		elgg_register_admin_menu_item('administer', 'evolution','advanced_statistics');
+		elgg_register_admin_menu_item('administer', 'global','advanced_statistics',100);
+		elgg_register_admin_menu_item('administer', 'groups','advanced_statistics',200);
+		elgg_register_admin_menu_item('administer', 'resources','advanced_statistics',300);
+		elgg_register_admin_menu_item('administer', 'evolution','advanced_statistics',700);
 
 	}
 
