@@ -65,6 +65,73 @@ function statistics_extended_users_metadata_count($metadata,$group=null){
 }
 
 /**
+ * Return the users count for each value associated with the metadata provided
+ *
+ * @param string $metadata
+ * @return array
+ */
+function statistics_extended_users_metadata_value_count($metadata,$value,$group=null){
+  $sector_metadata = get_metastring_id($metadata);
+  $dbprefix = elgg_get_config('dbprefix');
+
+  $query = "SELECT mv.string AS data, count(*) as total ";
+  $query .= "FROM {$dbprefix}users_entity ue ";
+  $query .= "JOIN {$dbprefix}entities e ON ue.guid = e.guid AND e.enabled='yes'";
+  $query .= "JOIN {$dbprefix}metadata m ON ue.guid = m.entity_guid ";
+  $query .= "JOIN {$dbprefix}metastrings mv ON m.value_id = mv.id ";
+  $query .= "JOIN {$dbprefix}metadata m2 ON ue.guid = m2.entity_guid ";
+  $query .= "JOIN {$dbprefix}metastrings m2v ON m.value_id = m2v.id ";
+  $query .= "WHERE m.name_id = {$sector_metadata} ";
+  $query .= "AND m2v.string like '$value' ";
+  if(!empty($group)){
+    $query.="AND ue.guid IN (SELECT guid_one FROM {$dbprefix}entity_relationships WHERE relationship='member' AND guid_two={$group}) ";
+  }
+
+  $query .= "GROUP BY data";
+  $resp = array();
+  $entities = get_data($query);
+  if (! empty($entities)) {
+    foreach ( $entities as $entity ) {
+      $resp[$entity->data] = $entity->total;
+    }
+  }
+  return $resp;
+}
+
+/**
+ * Return the users count for each value associated with the metadata provided
+ *
+ * @param string $metadata
+ * @return array
+ */
+function statistics_extended_groups_metadata_value_count($metadata,$value,$group=null){
+  $sector_metadata = get_metastring_id($metadata);
+  $dbprefix = elgg_get_config('dbprefix');
+
+  $query = "SELECT mv.string AS data, count(*) as total ";
+  $query .= "FROM {$dbprefix}groups_entity ue ";
+  $query .= "JOIN {$dbprefix}metadata m ON ue.guid = m.entity_guid ";
+  $query .= "JOIN {$dbprefix}metastrings mv ON m.value_id = mv.id ";
+  $query .= "JOIN {$dbprefix}metadata m2 ON ue.guid = m2.entity_guid ";
+  $query .= "JOIN {$dbprefix}metastrings m2v ON m.value_id = m2v.id ";
+  $query .= "WHERE m.name_id = {$sector_metadata} ";
+  $query .= "AND m2v.string like '$value' ";
+  if(!empty($group)){
+    $query.="AND ue.guid IN (SELECT guid_one FROM {$dbprefix}entity_relationships WHERE relationship='member' AND guid_two={$group}) ";
+  }
+
+  $query .= "GROUP BY data";
+  $resp = array();
+  $entities = get_data($query);
+  if (! empty($entities)) {
+    foreach ( $entities as $entity ) {
+      $resp[$entity->data] = $entity->total;
+    }
+  }
+  return $resp;
+}
+
+/**
  * Return the number of visits made from group members
  * @param $group group
  * @return integer
@@ -331,7 +398,8 @@ function statistics_extended_label_generator($labels,$values=array(),$prefix="st
 	$resp = array();
 	foreach($labels as $label){
 		if(empty($prefix)){
-			$resp[]="{$label} ({$values[$label]})";
+		    $label_ = ucfirst($label);
+			$resp[]="{$label_} ({$values[$label]})";
 		}
 		else{
 			$resp[]=sprintf(elgg_echo("{$prefix}{$label}"),$values[$label]);
@@ -367,6 +435,57 @@ function statistics_extended_tool_object($tool_name){
   	  break;
   	default:
   	  $resp[]=$tool_name;
+  }
+  return $resp;
+}
+
+function statistics_extended_geography_type_count($options){
+
+  $values = statistics_extended_get_ge_data($options);
+  $states = array_keys($values);
+
+  $query_options = array(
+  	'types'=>array('user','group'),
+    'count'=>true,
+  );
+  $resp = array();
+  foreach($states as $state){
+    $query_options['metadata_name_value_pairs']=array('name'=>'location_tags','value'=>$state,'case_sensitive'=>false);
+    $resp[$state] = elgg_get_entities_from_metadata($query_options);
+  }
+  ksort($resp);
+  return $resp;
+
+}
+
+function statistics_extended_get_ge_data($params){
+  elgg_load_library('statistics_extended:geo:lib');
+  //TODO add cache handling
+  $geo = new Services_GeoNames();
+  $geo_params = array('lang'=>get_language());
+  $query = $params['query'];
+  $method = 'children';
+  switch($query){
+  	case 'country':
+  	  $method = 'countryInfo';
+  	  $geo_params['country']=$params['query_value'];
+  	  $key = 'countryName';
+  	  break;
+  	case 'cities':
+  	  $key = 'name';
+  	case 'states':
+  	  $key = 'adminName1';
+  	  $geo_params['geonameId']=$params['query_value'];
+  	  break;
+  }
+  $result = $geo->$method($geo_params);
+  $resp = array();
+  if(!empty($result)){
+    foreach($result as $entity){
+      $key_ = elgg_trigger_plugin_hook('statistics:cleanup', 'geo',null,$entity->$key);
+
+      $resp[$key_]=$entity;
+    }
   }
   return $resp;
 }
