@@ -34,7 +34,7 @@
   }
 
   $resources_labels = statistics_extended_label_generator($resources,$resources_totals,'statistics:label:type:');
-  $resources_views_labels = statistics_extended_label_generator($resources_views,$resources_views_totals,'statistics:label:type:');
+  $resources_views_labels = statistics_extended_label_generator($resources,$resources_views_totals,'statistics:label:type:');
 
 ?>
 <div id="statistics_group_graphs" align="center">
@@ -56,8 +56,11 @@
 <?php
   $url = $vars['url']."action/export/global/?type=resources";
   $url = elgg_add_action_tokens_to_url($url);
+  $total_resources = array_sum($resources_totals);
+  if($total_resources < 10000){
 ?>
 <a href="<?php echo $url?>"><?php echo elgg_echo("export")?></a>
+<?php }?>
 </div>
 <div class="clear"></div>
 

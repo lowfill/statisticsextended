@@ -46,6 +46,7 @@ function statistics_extended_users_metadata_count($metadata,$group=null){
 
   $query = "SELECT mv.string AS data, count(*) as total ";
   $query .= "FROM {$dbprefix}users_entity ue ";
+  $query .= "JOIN " . $dbprefix . "entities e ON e.guid = ue.guid AND e.enabled='yes' ";
   $query .= "JOIN {$dbprefix}metadata m ON ue.guid = m.entity_guid ";
   $query .= "JOIN {$dbprefix}metastrings mv ON m.value_id = mv.id ";
   $query .= "WHERE m.name_id = {$sector_metadata} ";
@@ -273,6 +274,7 @@ function statistics_extended_object_count($object_subtype,$owner_guid,$container
 	if($container_guid!=null){
 		$options['container_guids']=$container_guid;
 	}
+
 	$count = elgg_get_entities($options);
 	$count = trigger_plugin_hook("cop_statistics:object:count", "object",$options,$count);
 	return $count;

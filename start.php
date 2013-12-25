@@ -15,6 +15,7 @@ function statistics_extended_init(){
     elgg_register_library('statistics_extended:export:lib', dirname(__FILE__)."/lib/export.php");
     elgg_register_library('statistics_extended:excel:lib', dirname(__FILE__)."/vendors/PHPExcel/Classes/PHPExcel.php");
     elgg_register_library('statistics_extended:geo:lib', dirname(__FILE__)."/vendors/Services_GeoNames/Services/GeoNames.php");
+    set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__)."/vendors/Services_GeoNames/");
 
     elgg_register_css('statistics_extended:css', elgg_get_simplecache_url('css', 'statistics_extended'));
 
